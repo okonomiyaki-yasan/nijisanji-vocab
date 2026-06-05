@@ -1,0 +1,21 @@
+{
+  "name": "NijiVocab - にじさんじENで英語学習",
+  "short_name": "NijiVocab",
+  "description": "にじさんじEN配信で出会った英単語を保存・管理するアプリ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

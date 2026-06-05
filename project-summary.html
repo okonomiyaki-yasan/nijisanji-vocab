@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NijiVocab - プロジェクトまとめ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.7; }
+    .container { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+    h1 { font-size: 28px; font-weight: 900; background: linear-gradient(135deg, #4f46e5, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+    h1 + p { color: #94a3b8; font-size: 13px; margin-bottom: 32px; }
+    h2 { font-size: 18px; font-weight: 700; color: #4f46e5; margin: 32px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff; }
+    h3 { font-size: 15px; font-weight: 600; color: #334155; margin: 16px 0 8px; }
+    .card { background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .card-header { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin: 2px 4px 2px 0; }
+    .badge-blue { background: #e0e7ff; color: #4338ca; }
+    .badge-green { background: #d1fae5; color: #065f46; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .badge-purple { background: #ede9fe; color: #6d28d9; }
+    .badge-red { background: #fee2e2; color: #991b1b; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 6px; font-size: 14px; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 13px; font-family: "SF Mono", Monaco, monospace; }
+    .file-tree { background: #1e293b; color: #e2e8f0; border-radius: 12px; padding: 16px 20px; font-family: "SF Mono", Monaco, monospace; font-size: 13px; line-height: 1.8; margin: 12px 0; }
+    .file-tree .dir { color: #93c5fd; }
+    .file-tree .file { color: #a5b4fc; }
+    .file-tree .desc { color: #64748b; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+    th { text-align: left; background: #f1f5f9; padding: 8px 12px; font-weight: 600; }
+    td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; }
+    .cmd { background: #1e293b; color: #e2e8f0; border-radius: 8px; padding: 12px 16px; font-family: "SF Mono", Monaco, monospace; font-size: 13px; margin: 8px 0; overflow-x: auto; }
+    .cmd .comment { color: #64748b; }
+    .status { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-green { background: #22c55e; }
+    .dot-yellow { background: #eab308; }
+    .dot-red { background: #ef4444; }
+    .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 600px) { .section-grid { grid-template-columns: 1fr; } }
+    .updated { color: #94a3b8; font-size: 12px; text-align: right; margin-top: 40px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>NijiVocab</h1>
+    <p>にじさんじENで英語を覚えるためのWebアプリ - プロジェクトまとめ</p>
+
+    <!-- ステータス -->
+    <h2>プロジェクト状況</h2>
+    <div class="section-grid">
+      <div class="card">
+        <div class="card-header">開発環境</div>
+        <div class="status"><span class="dot dot-green"></span> ローカル動作OK</div>
+        <div class="status"><span class="dot dot-green"></span> PWA対応済み</div>
+        <div class="status"><span class="dot dot-yellow"></span> デプロイ未完了</div>
+      </div>
+      <div class="card">
+        <div class="card-header">起動コマンド</div>
+        <div class="cmd">
+          <span class="comment"># 開発サーバー起動</span><br>
+          cd ~/claude/nijisanji-vocab<br>
+          npx next dev
+        </div>
+        <p style="font-size:13px; color:#64748b; margin-top:4px;">→ http://localhost:3000</p>
+      </div>
+    </div>
+
+    <!-- 技術構成 -->
+    <h2>技術構成</h2>
+    <div class="card">
+      <table>
+        <tr><th>項目</th><th>技術</th><th>用途</th></tr>
+        <tr><td>フレームワーク</td><td><span class="badge badge-blue">Next.js</span></td><td>フロント+API</td></tr>
+        <tr><td>言語</td><td><span class="badge badge-blue">TypeScript</span></td><td>型安全</td></tr>
+        <tr><td>スタイル</td><td><span class="badge badge-purple">Tailwind CSS</span></td><td>UIデザイン</td></tr>
+        <tr><td>辞書</td><td><span class="badge badge-green">Free Dictionary API</span></td><td>英語定義の取得</td></tr>
+        <tr><td>あいまい検索</td><td><span class="badge badge-green">Datamuse API</span></td><td>スペルミス補正・音声類似</td></tr>
+        <tr><td>翻訳</td><td><span class="badge badge-green">MyMemory API</span></td><td>カタカナ→英語、英→日翻訳</td></tr>
+        <tr><td>カナ変換</td><td><span class="badge badge-amber">wanakana</span></td><td>カタカナ→ローマ字</td></tr>
+        <tr><td>データ保存</td><td><span class="badge badge-amber">localStorage</span></td><td>ブラウザ内保存</td></tr>
+      </table>
+    </div>
+
+    <!-- ファイル構成 -->
+    <h2>ファイル構成</h2>
+    <div class="file-tree">
+      <span class="dir">nijisanji-vocab/</span><br>
+      ├── <span class="dir">src/</span><br>
+      │&nbsp;&nbsp; ├── <span class="dir">app/</span><br>
+      │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="file">layout.tsx</span> <span class="desc">← レイアウト・PWAメタ</span><br>
+      │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="file">page.tsx</span> <span class="desc">← メインUI（検索・単語帳）</span><br>
+      │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="file">globals.css</span> <span class="desc">← グローバルCSS</span><br>
+      │&nbsp;&nbsp; │&nbsp;&nbsp; └── <span class="dir">api/search/</span><br>
+      │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; └── <span class="file">route.ts</span> <span class="desc">← 検索API（翻訳・辞書・あいまい検索）</span><br>
+      │&nbsp;&nbsp; ├── <span class="dir">components/</span><br>
+      │&nbsp;&nbsp; │&nbsp;&nbsp; └── <span class="file">StreamerPicker.tsx</span> <span class="desc">← 配信者選択プルダウン</span><br>
+      │&nbsp;&nbsp; ├── <span class="dir">lib/</span><br>
+      │&nbsp;&nbsp; │&nbsp;&nbsp; └── <span class="file">storage.ts</span> <span class="desc">← localStorage操作</span><br>
+      │&nbsp;&nbsp; └── <span class="file">types.ts</span> <span class="desc">← 型定義</span><br>
+      └── <span class="dir">public/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="file">manifest.json</span> <span class="desc">← PWAマニフェスト</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="file">sw.js</span> <span class="desc">← Service Worker</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp; └── <span class="file">icon-*.png</span> <span class="desc">← アプリアイコン</span>
+    </div>
+
+    <!-- 実装済み機能 -->
+    <h2>実装済み機能</h2>
+    <div class="card">
+      <h3>検索機能</h3>
+      <ul>
+        <li>英語・カタカナ・ひらがな・スペルミスに対応</li>
+        <li>複数単語・フレーズ検索（"private investigator"等）</li>
+        <li>カタカナ → 翻訳API → 辞書の3段階変換</li>
+        <li>「もしかして」候補の表示</li>
+        <li>英語定義 + 日本語訳の二段表示</li>
+        <li>検索中のスケルトンローディング表示</li>
+        <li>IME変換中のEnter誤送信防止</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>単語帳機能</h3>
+      <ul>
+        <li>単語の保存・検索回数カウント（x3 のように表示）</li>
+        <li>配信者タグ（プルダウン選択式・新規追加可能）</li>
+        <li>配信者ごとのフィルタリング</li>
+        <li>動画URLメモ機能</li>
+        <li>単語帳内のテキスト検索</li>
+        <li>ソート（検索回数順・最近調べた順・追加日順）</li>
+        <li>自分メモ保存（辞書にない単語も自由に保存）</li>
+      </ul>
+    </div>
+
+    <!-- 検索の仕組み -->
+    <h2>検索の仕組み（処理フロー）</h2>
+    <div class="card">
+      <ol style="padding-left: 20px; font-size: 14px;">
+        <li>入力が日本語か判定</li>
+        <li>日本語 → <code>wanakana</code> でローマ字に変換</li>
+        <li>ローマ字で辞書を直接検索（ヒットすれば完了）</li>
+        <li>日本語入力なら <code>MyMemory API</code> で英語に翻訳</li>
+        <li>翻訳結果で辞書検索（ヒットすれば完了）</li>
+        <li>ローマ字を「de-japanize」して英語スペルに近づける<br>
+          <span style="color: #64748b;">例: purabeito → praveit (b→v), inbesuteigeetaa → investeiget</span></li>
+        <li><code>Datamuse API</code> で音声類似・スペル類似の候補取得</li>
+        <li>候補を辞書で引いて最初にヒットしたものを返す</li>
+        <li>すべての定義を <code>MyMemory API</code> で日本語に翻訳</li>
+      </ol>
+    </div>
+
+    <!-- デプロイ手順 -->
+    <h2>デプロイ手順（未完了）</h2>
+    <div class="card">
+      <ol style="padding-left: 20px; font-size: 14px;">
+        <li>GitHubアカウント作成 → <a href="https://github.com/signup" style="color: #4f46e5;">github.com/signup</a></li>
+        <li>GitHub CLI インストール
+          <div class="cmd">brew install gh</div>
+        </li>
+        <li>GitHub にログイン
+          <div class="cmd">gh auth login</div>
+        </li>
+        <li>リポジトリ作成 & プッシュ
+          <div class="cmd">
+            cd ~/claude/nijisanji-vocab<br>
+            gh repo create nijisanji-vocab --public --source=. --push
+          </div>
+        </li>
+        <li>Vercel にデプロイ → <a href="https://vercel.com" style="color: #4f46e5;">vercel.com</a> でGitHubログイン → Import</li>
+      </ol>
+    </div>
+
+    <!-- 既知の制限 -->
+    <h2>既知の制限・注意点</h2>
+    <div class="card">
+      <ul>
+        <li><span class="badge badge-amber">翻訳精度</span> カタカナ→英語変換は完璧ではない（特殊な読みのカタカナ語）</li>
+        <li><span class="badge badge-amber">技術用語</span> fault domain等の専門用語は一般辞書にない → 自分メモで対応</li>
+        <li><span class="badge badge-red">データ管理</span> localStorageなのでブラウザ/端末ごとに別管理（同期なし）</li>
+        <li><span class="badge badge-amber">API制限</span> MyMemory翻訳APIは1日の無料リクエスト数に上限あり</li>
+      </ul>
+    </div>
+
+    <!-- 今後のアイデア -->
+    <h2>今後のアイデア</h2>
+    <div class="section-grid">
+      <div class="card">
+        <div class="card-header">機能追加</div>
+        <ul>
+          <li>クイズ・復習モード（検索回数が多い単語を出題）</li>
+          <li>データのエクスポート/インポート</li>
+          <li>複数端末でのデータ同期（Supabase等）</li>
+          <li>単語カードのフリック操作</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">改善</div>
+        <ul>
+          <li>よく使う配信者のピン留め</li>
+          <li>単語の「覚えた」マーク機能</li>
+          <li>統計ダッシュボード（今週何語覚えた等）</li>
+          <li>音声再生ボタン</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="updated">最終更新: 2026年6月6日 | プロジェクトパス: ~/claude/nijisanji-vocab</p>
+  </div>
+</body>
+</html>
