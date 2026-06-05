@@ -11,6 +11,8 @@ import {
   deleteWord,
   getAllStreamers,
   getStreamersForWord,
+  exportWords,
+  importWords,
 } from "@/lib/storage";
 import StreamerPicker from "@/components/StreamerPicker";
 
@@ -40,6 +42,7 @@ export default function Home() {
   const [wordbookSearch, setWordbookSearch] = useState("");
   const [streamerFilter, setStreamerFilter] = useState<string | null>(null);
   const [streamers, setStreamers] = useState<string[]>([]);
+  const [importMessage, setImportMessage] = useState("");
 
   useEffect(() => {
     setSavedWords(getSavedWords());
@@ -179,6 +182,32 @@ export default function Home() {
     deleteWord(word);
     refreshWords();
     setExpandedWord(null);
+  };
+
+  const handleImport = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json";
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const data = JSON.parse(ev.target?.result as string);
+          if (!Array.isArray(data)) throw new Error("invalid");
+          const result = importWords(data);
+          refreshWords();
+          setImportMessage(`${result.added}件追加、${result.updated}件更新しました！`);
+          setTimeout(() => setImportMessage(""), 3000);
+        } catch {
+          setImportMessage("ファイルの読み込みに失敗しました");
+          setTimeout(() => setImportMessage(""), 3000);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
   };
 
   const filteredAndSortedWords = [...savedWords]
@@ -480,6 +509,30 @@ export default function Home() {
 
         {tab === "wordbook" && (
           <div className="space-y-3">
+            {/* エクスポート/インポート */}
+            <div className="flex gap-2">
+              <button
+                onClick={exportWords}
+                disabled={savedWords.length === 0}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm hover:bg-emerald-500 transition-all disabled:opacity-30"
+              >
+                データ書き出し
+              </button>
+              <button
+                onClick={handleImport}
+                className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-white text-indigo-600 border border-indigo-200 shadow-sm hover:bg-indigo-50 transition-all"
+              >
+                データ読み込み
+              </button>
+            </div>
+            {importMessage && (
+              <div className={`text-center text-sm font-bold py-2 rounded-xl ${
+                importMessage.includes("失敗") ? "text-red-600 bg-red-50" : "text-green-600 bg-green-50"
+              }`}>
+                {importMessage}
+              </div>
+            )}
+
             {savedWords.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-lg text-gray-400 mb-1">

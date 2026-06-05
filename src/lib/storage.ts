@@ -112,3 +112,55 @@ export function getStreamersForWord(word: SavedWord): string[] {
   }
   return [...set];
 }
+
+// エクスポート: 単語帳データをJSONファイルとしてダウンロード
+export function exportWords(): void {
+  const words = getSavedWords();
+  const json = JSON.stringify(words, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `nijivocab-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// インポート: JSONファイルから単語帳データを読み込み（重複は統合）
+export function importWords(data: SavedWord[]): { added: number; updated: number } {
+  const existing = getSavedWords();
+  let added = 0;
+  let updated = 0;
+
+  for (const incoming of data) {
+    const match = existing.find(
+      (w) => w.word.toLowerCase() === incoming.word.toLowerCase()
+    );
+    if (match) {
+      // 検索回数は大きい方を採用
+      if (incoming.searchCount > match.searchCount) {
+        match.searchCount = incoming.searchCount;
+      }
+      // 動画メモは重複しないものを追加
+      for (const memo of incoming.videoMemos) {
+        const duplicate = match.videoMemos.some(
+          (m) => m.url === memo.url && m.streamer === memo.streamer && m.note === memo.note
+        );
+        if (!duplicate) {
+          match.videoMemos.push(memo);
+        }
+      }
+      // 意味が空なら上書き
+      if (!match.meaningJa && incoming.meaningJa) {
+        match.meaningJa = incoming.meaningJa;
+      }
+      updated++;
+    } else {
+      existing.push(incoming);
+      added++;
+    }
+  }
+
+  saveWords(existing);
+  return { added, updated };
+}
