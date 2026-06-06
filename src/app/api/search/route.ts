@@ -31,7 +31,7 @@ interface WordResult {
   phonetic: string;
   meanings: {
     partOfSpeech: string;
-    definitions: { definition: string; example?: string }[];
+    definitions: { definition: string; definitionJa?: string; example?: string }[];
   }[];
   suggestions: string[];
 }
@@ -280,6 +280,28 @@ async function searchSingleWord(input: string): Promise<WordResult> {
   };
 }
 
+// フレーズ（複数単語）を翻訳APIで日本語訳して結果を作る
+async function searchPhrase(phrase: string): Promise<WordResult | null> {
+  const ja = await translateEnToJa(phrase);
+  if (!ja || ja === phrase) return null;
+  return {
+    word: phrase,
+    phonetic: "",
+    meanings: [
+      {
+        partOfSpeech: "phrase",
+        definitions: [
+          {
+            definition: phrase,
+            definitionJa: ja,
+          },
+        ],
+      },
+    ],
+    suggestions: [],
+  };
+}
+
 export async function GET(request: NextRequest) {
   const query = request.nextUrl.searchParams.get("q")?.trim();
   if (!query) {
@@ -291,30 +313,27 @@ export async function GET(request: NextRequest) {
 
   const tokens = query.split(/[\s\u3000]+/).filter(Boolean);
 
-  // 複数単語の場合、まずフレーズとして一括検索を試みる
-  if (tokens.length > 1) {
-    const phraseResult = await searchSingleWord(query);
-    if (phraseResult.meanings.length > 0) {
-      return NextResponse.json({ results: [phraseResult] });
-    }
-  }
-
-  // 日本語入力の場合、フレーズ全体を翻訳→翻訳結果の単語で個別検索を試みる
-  // 例: "フォルトドメイン" → 翻訳 "Fault Domain" → fault, domain を個別検索
   const stripped = query.replace(/[\s\u3000]+/g, "");
-  if (isJapaneseInput(stripped)) {
-    const translated = await translateJaToEn(query);
-    if (translated) {
-      const translatedTokens = translated.split(/\s+/).filter(Boolean);
-      if (translatedTokens.length >= 1) {
-        // まずフレーズとして辞書検索
-        const phraseDict = await lookupWord(translated);
-        if (phraseDict) {
+
+  // 複数単語の場合
+  if (tokens.length > 1) {
+    // まず辞書でフレーズ検索（"look up" "take it easy" 等）
+    const phraseDict = await lookupWord(query);
+    if (phraseDict) {
+      return NextResponse.json({ results: [await dictToResult(phraseDict)] });
+    }
+
+    // 日本語入力: 翻訳してから検索
+    if (isJapaneseInput(stripped)) {
+      const translated = await translateJaToEn(query);
+      if (translated) {
+        const translatedDict = await lookupWord(translated);
+        if (translatedDict) {
           return NextResponse.json({
-            results: [await dictToResult(phraseDict)],
+            results: [await dictToResult(translatedDict)],
           });
         }
-        // フレーズでなければ単語ごとに検索
+        const translatedTokens = translated.split(/\s+/).filter(Boolean);
         const translatedResults = await Promise.all(
           translatedTokens.map(searchSingleWord)
         );
@@ -323,9 +342,25 @@ export async function GET(request: NextRequest) {
         }
       }
     }
+
+    // 英語フレーズ: 翻訳APIで日本語訳 + 個別単語の辞書検索
+    const [phraseResult, ...wordResults] = await Promise.all([
+      searchPhrase(query),
+      ...tokens.map(searchSingleWord),
+    ]);
+
+    const results: WordResult[] = [];
+    if (phraseResult) results.push(phraseResult);
+    for (const wr of wordResults) {
+      if (wr.meanings.length > 0) results.push(wr);
+    }
+
+    if (results.length > 0) {
+      return NextResponse.json({ results });
+    }
   }
 
-  // フォールバック: 元の入力を単語ごとに検索
+  // 単一単語の検索
   const results = await Promise.all(tokens.map(searchSingleWord));
 
   return NextResponse.json({ results });

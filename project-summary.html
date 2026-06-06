@@ -54,7 +54,7 @@
         <div class="card-header">開発環境</div>
         <div class="status"><span class="dot dot-green"></span> ローカル動作OK</div>
         <div class="status"><span class="dot dot-green"></span> PWA対応済み</div>
-        <div class="status"><span class="dot dot-yellow"></span> デプロイ未完了</div>
+        <div class="status"><span class="dot dot-green"></span> Vercelデプロイ済み</div>
       </div>
       <div class="card">
         <div class="card-header">起動コマンド</div>
@@ -64,6 +64,10 @@
           npx next dev
         </div>
         <p style="font-size:13px; color:#64748b; margin-top:4px;">→ http://localhost:3000</p>
+        <div class="cmd" style="margin-top:8px;">
+          <span class="comment"># 本番URL</span><br>
+          https://nijisanji-vocab.vercel.app/
+        </div>
       </div>
     </div>
 
@@ -123,12 +127,14 @@
       <h3>単語帳機能</h3>
       <ul>
         <li>単語の保存・検索回数カウント（x3 のように表示）</li>
-        <li>配信者タグ（プルダウン選択式・新規追加可能）</li>
+        <li>配信者タグ（プルダウン選択式・新規追加可能）<br>
+          <span style="color: #64748b; font-size: 13px;">※ 配信者名以外にも自由に使える（映画名・教材名・TOEIC等）。どこで覚えた単語かの管理に便利</span></li>
         <li>配信者ごとのフィルタリング</li>
         <li>動画URLメモ機能</li>
         <li>単語帳内のテキスト検索</li>
         <li>ソート（検索回数順・最近調べた順・追加日順）</li>
         <li>自分メモ保存（辞書にない単語も自由に保存）</li>
+        <li>データ書き出し/読み込み（JSON形式、端末間のデータ移行用）</li>
       </ul>
     </div>
 
@@ -149,25 +155,23 @@
       </ol>
     </div>
 
-    <!-- デプロイ手順 -->
-    <h2>デプロイ手順（未完了）</h2>
+    <!-- デプロイ情報 -->
+    <h2>デプロイ情報</h2>
     <div class="card">
-      <ol style="padding-left: 20px; font-size: 14px;">
-        <li>GitHubアカウント作成 → <a href="https://github.com/signup" style="color: #4f46e5;">github.com/signup</a></li>
-        <li>GitHub CLI インストール
-          <div class="cmd">brew install gh</div>
-        </li>
-        <li>GitHub にログイン
-          <div class="cmd">gh auth login</div>
-        </li>
-        <li>リポジトリ作成 & プッシュ
-          <div class="cmd">
-            cd ~/claude/nijisanji-vocab<br>
-            gh repo create nijisanji-vocab --public --source=. --push
-          </div>
-        </li>
-        <li>Vercel にデプロイ → <a href="https://vercel.com" style="color: #4f46e5;">vercel.com</a> でGitHubログイン → Import</li>
-      </ol>
+      <div class="status"><span class="dot dot-green"></span> デプロイ済み</div>
+      <table style="margin-top: 8px;">
+        <tr><td style="font-weight:600;">本番URL</td><td><a href="https://nijisanji-vocab.vercel.app/" style="color: #4f46e5;">https://nijisanji-vocab.vercel.app/</a></td></tr>
+        <tr><td style="font-weight:600;">GitHub</td><td>okonomiyaki-yasan/nijisanji-vocab</td></tr>
+        <tr><td style="font-weight:600;">ホスティング</td><td>Vercel（Hobby / 無料）</td></tr>
+        <tr><td style="font-weight:600;">自動デプロイ</td><td>mainブランチにpushすると自動反映</td></tr>
+      </table>
+      <h3 style="margin-top: 12px;">更新の流れ</h3>
+      <div class="cmd">
+        <span class="comment"># コードを修正したら</span><br>
+        git add -A && git commit -m "変更内容"<br>
+        git push<br>
+        <span class="comment"># → Vercelが自動でデプロイ（1〜2分で反映）</span>
+      </div>
     </div>
 
     <!-- 既知の制限 -->
@@ -176,7 +180,7 @@
       <ul>
         <li><span class="badge badge-amber">翻訳精度</span> カタカナ→英語変換は完璧ではない（特殊な読みのカタカナ語）</li>
         <li><span class="badge badge-amber">技術用語</span> fault domain等の専門用語は一般辞書にない → 自分メモで対応</li>
-        <li><span class="badge badge-red">データ管理</span> localStorageなのでブラウザ/端末ごとに別管理（同期なし）</li>
+        <li><span class="badge badge-amber">データ管理</span> localStorageなのでブラウザ/端末ごとに別管理（書き出し/読み込みで手動同期可能）</li>
         <li><span class="badge badge-amber">API制限</span> MyMemory翻訳APIは1日の無料リクエスト数に上限あり</li>
       </ul>
     </div>
@@ -188,7 +192,7 @@
         <div class="card-header">機能追加</div>
         <ul>
           <li>クイズ・復習モード（検索回数が多い単語を出題）</li>
-          <li>データのエクスポート/インポート</li>
+          <li><s>データのエクスポート/インポート</s> ← 実装済み！</li>
           <li>複数端末でのデータ同期（Supabase等）</li>
           <li>単語カードのフリック操作</li>
         </ul>
@@ -202,6 +206,18 @@
           <li>音声再生ボタン</li>
         </ul>
       </div>
+    </div>
+
+    <!-- データ同期の使い方 -->
+    <h2>端末間データ同期の方法</h2>
+    <div class="card">
+      <ol style="padding-left: 20px; font-size: 14px;">
+        <li><b>スマホ</b>で普段通り単語を貯める</li>
+        <li>単語帳タブの<span class="badge badge-green">データ書き出し</span>を押す → JSONファイルがダウンロードされる</li>
+        <li>そのファイルをPCに送る（AirDrop / メール / LINE など）</li>
+        <li><b>PC</b>で単語帳タブの<span class="badge badge-blue">データ読み込み</span>を押してファイルを選択</li>
+        <li>重複する単語は自動統合（検索回数は大きい方を採用、動画メモもマージ）</li>
+      </ol>
     </div>
 
     <p class="updated">最終更新: 2026年6月6日 | プロジェクトパス: ~/claude/nijisanji-vocab</p>
